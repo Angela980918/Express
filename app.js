@@ -3,6 +3,9 @@ const express = require('express')
 // 创建express实例
 const app = express()
 
+// 导入Joi验证规则
+const Joi = require('joi')
+
 // cors跨域
 const cors = require('cors')
 // 全局挂载
@@ -11,6 +14,8 @@ app.use(cors())
 //导入中间件
 var bodyParser = require('body-parser')
 
+// parse application/x-www-form-urlencoded
+// 当extended为false时，值为数组或者字符串，当为ture时，值可以为任意类型
 app.use(bodyParser.urlencoded({
 	extended: true
 }))
@@ -32,12 +37,14 @@ const jwtconfig = require('./jwt_config/index.js')
 const {
 	expressjwt: jwt
 } = require('express-jwt')
+
 // 排除不需要携带token请求
+// 正则表达式 --> 以/或者/api/开头
 app.use(jwt({
 	secret: jwtconfig.jwtSecretKey,
 	algorithms: ['HS256']
 }).unless({
-	path: [/^\/api\//]
+	path: [/^\/(api\/)?/]
 }))
 
 // 监听端口
@@ -54,6 +61,16 @@ app.get('/', (req, res) => {
 // 登录请求
 const loginRouter = require('./router/login.js')
 app.use('/api', loginRouter)
+
+// 对不符合joi规则的情况进行报错
+app.use((err, req, res, next) => {
+	if (err instanceof Joi.ValidationError) {
+		res.send({
+			status: 1,
+			msg: '输入的数据不符合验证规则'
+		})
+	}
+})
 
 // 注册请求
 const registerRouter = require('./router/login.js')
