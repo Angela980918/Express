@@ -49,7 +49,7 @@ exports.register = (req, res) => {
 			if (results.affectedRows !== 1) {
 				return res.send({
 					status: 1,
-					msg: '注册账号失败',
+					msg: '注册账号失败' ,
 				})
 			}
 			res.send({
