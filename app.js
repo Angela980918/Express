@@ -21,6 +21,17 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(bodyParser.json())
 
+// Multer 是一个 node.js 中间件，用于处理 multipart/form-data 类型的表单数据，它主要用于上传文件。
+const multer = require("multer");
+// 在server服务端下新建一个public文件夹，在public文件夹下新建upload文件用于存放图片
+const upload = multer({
+	dest: './public/upload'
+})
+app.use(upload.any())
+// 静态托管
+app.use(express.static("./public"));
+
+
 app.use((req, res, next) => {
 	// status=0为成功,status=1为失败,默认设置为1
 	res.cc = (err, status = 1) => {
@@ -58,9 +69,13 @@ app.get('/', (req, res) => {
 	res.send('Hello World!!!')
 })
 
-// 登录请求
+// login请求
 const loginRouter = require('./router/login.js')
 app.use('/api', loginRouter)
+
+// user请求
+const userRouter = require('./router/userinfo.js')
+app.use('/user', userRouter)
 
 // 对不符合joi规则的情况进行报错
 app.use((err, req, res, next) => {
@@ -71,7 +86,3 @@ app.use((err, req, res, next) => {
 		})
 	}
 })
-
-// 注册请求
-const registerRouter = require('./router/login.js')
-app.use('/api', registerRouter)
