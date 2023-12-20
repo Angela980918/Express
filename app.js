@@ -34,6 +34,7 @@ app.use(express.static("./public"));
 
 app.use((req, res, next) => {
 	// status=0为成功,status=1为失败,默认设置为1
+	// 自定义res.cc方法
 	res.cc = (err, status = 1) => {
 		res.send({
 			status,
