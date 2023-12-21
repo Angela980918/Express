@@ -50,5 +50,8 @@ router.post("/changePassword", expressJoi(password_limit), userInfoHandler.chang
 // 自动生成ID
 router.post('/createID', userInfoHandler.createID)
 
+// 修改密码 (验证用户邮箱email,用户账号account)
+router.post('/verifyAccountAndEmail', userInfoHandler.verifyAccountAndEmail)
+
 // 向外暴露路由
 module.exports = router

@@ -56,7 +56,7 @@ exports.getUserInfo = (req, res) => {
 		if (err) return res.cc(err)
 		res.send({
 			status: 0,
-			result: result[0]
+			result: result[0],
 		})
 	})
 }
@@ -279,6 +279,40 @@ exports.createID = (req, res) => {
 						msg: '员工ID已经生成'
 					})
 				})
+			})
+		}
+	})
+}
+
+/**
+ * 修改密码 (验证用户邮箱email,用户账号account)
+ * 用户邮箱 email(*)
+ * 用户账号 account (*)
+ */
+exports.verifyAccountAndEmail = (req, res) => {
+	const {
+		account,
+		email
+	} = req.body
+
+	const sql = 'select * from users where account = ?'
+	db.query(sql, account, (err, result) => {
+		if (err) return res.cc(err)
+		// 1.判断邮箱是否已绑定
+		if (!result[0].email) return res.send({
+			status: 1,
+			msg: '邮箱未绑定,请联系管理员'
+		})
+		// 判断邮箱是否正确
+		if (result[0].email == email) {
+			res.send({
+				status: 0,
+				msg: '查询成功'
+			})
+		} else {
+			res.send({
+				status: 1,
+				msg: '查询失败'
 			})
 		}
 	})
