@@ -4,6 +4,8 @@ const db = require("../db/index.js");
 const bcrypt = require("bcrypt");
 // 导入node.js的crypto库生成uuid
 const crypto = require("crypto");
+// 日期
+const moment = require('moment');
 
 // 上传头像
 exports.uploadAvatar = (req, res) => {
@@ -47,7 +49,7 @@ exports.bindAccount = (req, res) => {
 	})
 }
 
-// 获取用户信息 ID
+// 获取用户信息 id
 exports.getUserInfo = (req, res) => {
 	const sql = 'select * from users where id = ?'
 	db.query(sql, req.body.id, (err, result) => {
@@ -59,7 +61,7 @@ exports.getUserInfo = (req, res) => {
 	})
 }
 
-// 修改姓名 ID NAME
+// 修改姓名 id name
 exports.changeName = (req, res) => {
 	const {
 		id,
@@ -75,7 +77,7 @@ exports.changeName = (req, res) => {
 	})
 }
 
-// 修改性别 ID SEX
+// 修改性别 id sex
 exports.changeSex = (req, res) => {
 	const {
 		id,
@@ -173,7 +175,7 @@ exports.updateUserInfo = (req, res) => {
 	})
 }
 
-// 修改邮箱 ID EMAIL
+// 修改邮箱 id email
 exports.changeEmail = (req, res) => {
 	const {
 		id,
@@ -186,5 +188,98 @@ exports.changeEmail = (req, res) => {
 			status: 0,
 			message: '修改成功'
 		})
+	})
+}
+
+// 登陆页修改密码 newPassword id
+exports.changePasswordInLogin = (req, res) => {
+	const user = req.body
+	user.newPassword = bcrypt.hashSync(user.newPassword, 10)
+	const sql = 'update users set password = ? where id = ?'
+	db.query(sql, [user.newPassword, user.id], (err, result) => {
+		if (err) return res.cc(err)
+		res.send({
+			status: 0,
+			message: '密码修改成功'
+		})
+	})
+}
+
+/**
+ * 修改用户密码 (旧密码 -> 新密码)
+ * 用户id (*)
+ * 新密码newPassword (*)
+ * 旧密码oldPassword (*)
+ */
+exports.changePassword = (req, res) => {
+	const {
+		id,
+		newPassword,
+		oldPassword
+	} = req.body
+	const sql = 'select password from users where id = ?'
+	db.query(sql, id, (err, result) => {
+		if (err) return res.cc(err)
+		const compareResult = bcrypt.compareSync(oldPassword, result[0].password)
+		if (!compareResult) {
+			return res.send({
+				status: 1,
+				message: '原密码错误'
+			})
+		}
+		const newPasswordSync = bcrypt.hashSync(newPassword, 10)
+		const sql1 = 'update users set password = ? where id = ?'
+		db.query(sql1, [newPasswordSync, id], (err, result) => {
+			if (err) return res.cc(err)
+			res.send({
+				status: 0,
+				message: '密码修改成功'
+			})
+		})
+	})
+}
+
+/**
+ * 自动生成ID
+ * 用户id (*)
+ */
+exports.createID = (req, res) => {
+	const {
+		id
+	} = req.body
+
+	// 判断员工ID是否已存在
+	const sqls = 'select user_id from users where id = ?'
+	db.query(sqls, id, (err, result) => {
+		if (err) return res.cc(err)
+		if (result[0].user_id) return res.send({
+			status: 1,
+			msg: '员工ID已存在，无需创建'
+		})
+		if (!result[0].user_id) {
+			// ID统一前缀
+			const card = 'CB'
+			const currentDate = moment().format('YYYYMMDD')
+			const sql = `SELECT COUNT(*) AS count FROM users WHERE user_id LIKE '${card}${currentDate}%'`
+			db.query(sql, (err, result) => {
+				if (err) return res.cc(err)
+				// 统计该日期下的账号总数
+				const count = result[0].count + 1;
+				// 0 --> 01,
+				const suffix = count > 0 ? count.toString().padStart(2, '0') : '01'
+				// 生成ID
+				const newID = `${card}${currentDate}${suffix}`
+
+				// 更新
+				const sql1 = 'update users set user_id = ? where id = ?'
+				db.query(sql1, [newID, id], (err, result) => {
+					if (err) return res.cc(err)
+					res.send({
+						status: 0,
+						msg: '员工ID已经生成'
+					})
+				})
+			})
+		}
 	})
 }

@@ -16,6 +16,7 @@ const userInfoHandler = require("../router_handle/userinfo");
 const {
 	name_limit,
 	email_limit,
+	password_limit,
 } = require('../limit/user.js')
 
 
@@ -39,6 +40,15 @@ router.post("/updateUserInfo", userInfoHandler.updateUserInfo)
 
 // 修改邮箱
 router.post("/changeEmail", expressJoi(email_limit), userInfoHandler.changeEmail)
+
+// 修改密码(登陆页)
+router.post("/changePasswordInLogin", userInfoHandler.changePasswordInLogin)
+
+// 修改密码(旧密码 -> 新密码)
+router.post("/changePassword", expressJoi(password_limit), userInfoHandler.changePassword)
+
+// 自动生成ID
+router.post('/createID', userInfoHandler.createID)
 
 // 向外暴露路由
 module.exports = router
