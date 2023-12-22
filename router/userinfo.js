@@ -17,6 +17,7 @@ const {
 	name_limit,
 	email_limit,
 	password_limit,
+	passwordLogin_limit
 } = require('../limit/user.js')
 
 
@@ -42,7 +43,7 @@ router.post("/updateUserInfo", userInfoHandler.updateUserInfo)
 router.post("/changeEmail", expressJoi(email_limit), userInfoHandler.changeEmail)
 
 // 修改密码(登陆页)
-router.post("/changePasswordInLogin", userInfoHandler.changePasswordInLogin)
+router.post("/changePasswordInLogin", expressJoi(passwordLogin_limit), userInfoHandler.changePasswordInLogin)
 
 // 修改密码(旧密码 -> 新密码)
 router.post("/changePassword", expressJoi(password_limit), userInfoHandler.changePassword)
