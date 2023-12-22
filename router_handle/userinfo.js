@@ -200,7 +200,7 @@ exports.changePasswordInLogin = (req, res) => {
 		if (err) return res.cc(err)
 		res.send({
 			status: 0,
-			message: '密码修改成功'
+			msg: '密码修改成功'
 		})
 	})
 }
@@ -298,7 +298,12 @@ exports.verifyAccountAndEmail = (req, res) => {
 	const sql = 'select * from users where account = ?'
 	db.query(sql, account, (err, result) => {
 		if (err) return res.cc(err)
-		// 1.判断邮箱是否已绑定
+		// 1.判断账号是否存在
+		if (Array.isArray(result) && result.length === 0) return res.send({
+			status: 1,
+			msg: '账号不存在'
+		})
+		// 2.判断邮箱是否已绑定
 		if (!result[0].email) return res.send({
 			status: 1,
 			msg: '邮箱未绑定,请联系管理员'
@@ -307,12 +312,13 @@ exports.verifyAccountAndEmail = (req, res) => {
 		if (result[0].email == email) {
 			res.send({
 				status: 0,
-				msg: '查询成功'
+				id: result[0].id,
+				msg: '验证通过'
 			})
 		} else {
 			res.send({
 				status: 1,
-				msg: '查询失败'
+				msg: '邮箱不正确'
 			})
 		}
 	})
