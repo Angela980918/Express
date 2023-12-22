@@ -49,7 +49,7 @@ exports.register = (req, res) => {
 			if (results.affectedRows !== 1) {
 				return res.send({
 					status: 1,
-					msg: '注册账号失败' ,
+					msg: '注册账号失败',
 				})
 			}
 			res.send({
@@ -72,11 +72,11 @@ exports.login = (req, res) => {
 		const compareResult = bcrypt.compareSync(loginfo.password, result[0].password)
 		// 2.1密码错误比较失败
 		if (!compareResult) {
-			return res.cc('登录失败')
+			return res.cc('密码错误，登录失败')
 		}
 		// 3.账号状态是否可用
 		if (result[0].status == 1) {
-			return res.cc('账号被冻结')
+			return res.cc('账号被冻结，请练习管理员')
 		}
 		// 4.生成返回给前端的token --> 剔除加密后的密码,头像,创建时间等等
 		const userInfo = {
