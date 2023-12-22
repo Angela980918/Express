@@ -44,3 +44,11 @@ exports.password_limit = {
 		newPassword
 	}
 }
+
+exports.passwordLogin_limit = {
+	// 表示对req.body里面的数据进行验证
+	body: {
+		id,
+		newPassword
+	}
+}
