@@ -17,7 +17,7 @@ var bodyParser = require('body-parser')
 // parse application/x-www-form-urlencoded
 // 当extended为false时，值为数组或者字符串，当为ture时，值可以为任意类型
 app.use(bodyParser.urlencoded({
-	extended: true
+	extended: false
 }))
 app.use(bodyParser.json())
 
