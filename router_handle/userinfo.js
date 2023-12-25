@@ -20,8 +20,10 @@ exports.uploadAvatar = (req, res) => {
 	}, (err, result) => {
 		if (err) return res.cc(err)
 		res.send({
+			AvatarID,
 			status: 0,
 			url: "http://127.0.0.1:3007/upload/" + newName,
+			msg: '头像更新成功'
 		})
 	})
 };
