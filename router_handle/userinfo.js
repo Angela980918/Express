@@ -12,7 +12,7 @@ const moment = require("moment");
 // 上传头像
 exports.uploadAvatar = (req, res) => {
   const { id, account } = req.body;
-	console.log(req.body);
+  console.log(req.body);
 
   // 1.判断用户是否有上传过头像
   const sqld = "select * from users where id = ? and account = ?";
@@ -112,12 +112,23 @@ exports.getUserInfo = (req, res) => {
 // 修改姓名 id name
 exports.changeName = (req, res) => {
   const { id, name } = req.body;
-  const sql = "update users set name = ? where id = ?";
-  db.query(sql, [name, id], (err, result) => {
+  if (!name) return res.cc("姓名不能为空");
+
+  // 1.查询姓名是否修改过
+  const sqls = "select * from users where id = ?";
+  db.query(sqls, id, (err, result) => {
     if (err) return res.cc(err);
-    res.send({
-      status: 0,
-      message: "修改成功",
+    if (result.length !== 1) return res.cc("用户不存在");
+    if (result[0].name === name) return res.cc("姓名未修改");
+
+    // 2.修改姓名
+    const sql = "update users set name = ? where id = ?";
+    db.query(sql, [name, id], (err, result) => {
+      if (err) return res.cc(err);
+      res.send({
+        status: 0,
+        msg: "修改成功",
+      });
     });
   });
 };
@@ -125,12 +136,23 @@ exports.changeName = (req, res) => {
 // 修改性别 id sex
 exports.changeSex = (req, res) => {
   const { id, sex } = req.body;
-  const sql = "update users set sex = ? where id = ?";
-  db.query(sql, [sex, id], (err, result) => {
+  if (!sex) return res.cc("性别不能为空");
+
+  // 1.查询原来的性别
+  const sqls = "select * from users where id = ?";
+  db.query(sqls, id, (err, result) => {
     if (err) return res.cc(err);
-    res.send({
-      status: 0,
-      message: "修改成功",
+    if (result.length !== 1) return res.cc("用户不存在");
+    if (result[0].sex === sex) return res.cc("性别未修改");
+
+    // 2.修改性别
+    const sql = "update users set sex = ? where id = ?";
+    db.query(sql, [sex, id], (err, result) => {
+      if (err) return res.cc(err);
+      res.send({
+        status: 0,
+        msg: "修改成功",
+      });
     });
   });
 };
@@ -212,12 +234,23 @@ exports.updateUserInfo = (req, res) => {
 // 修改邮箱 id email
 exports.changeEmail = (req, res) => {
   const { id, email } = req.body;
-  const sql = "update users set email = ? where id = ?";
-  db.query(sql, [email, id], (err, result) => {
+  if (!email) return res.cc("邮箱不能为空");
+
+  // 1.查询邮箱是否修改过
+  const sqls = "select * from users where id = ?";
+  db.query(sqls, id, (err, result) => {
     if (err) return res.cc(err);
-    res.send({
-      status: 0,
-      message: "修改成功",
+    if (result.length !== 1) return res.cc("用户不存在");
+    if (result[0].email === email) return res.cc("邮箱未修改");
+
+    // 2.修改邮箱
+    const sql = "update users set email = ? where id = ?";
+    db.query(sql, [email, id], (err, result) => {
+      if (err) return res.cc(err);
+      res.send({
+        status: 0,
+        msg: "修改成功",
+      });
     });
   });
 };
