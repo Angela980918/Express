@@ -6,18 +6,16 @@ const joi = require('joi')
 const id = joi.required()
 
 // 姓名规则
-const name = joi.string().pattern(/^(?:[a-zA-Z.\s]{2,20}|[\u4e00-\u9fa5]{2,4}(?:·[\u4e00-\u9fa5]{2,4})?)$/).required()
+const name = joi.string().pattern(/^(?=.{2,50}$)[a-zA-Z\u4e00-\u9fa5]+(?:\s[a-zA-Z\u4e00-\u9fa5]+)*$/).required()
 
 // 邮箱规则
 const email = joi.string().pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/).required()
 
 // 新密码规则
 const newPassword = joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/).min(6).max(12).required()
-	.required()
 
 // 旧密码规则
 const oldPassword = joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/).min(6).max(12).required()
-	.required()
 
 
 exports.name_limit = {
