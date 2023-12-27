@@ -12,7 +12,6 @@ const account = joi.string().alphanum().min(6).max(15).required()
 
 // 密码验证
 const password = joi.string().pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]+$/).min(6).max(12).required()
-	.required()
 
 exports.login_limit = {
 	// 表示对req.body里面的数据进行验证
