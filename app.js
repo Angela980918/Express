@@ -78,6 +78,10 @@ app.use('/api', loginRouter)
 const userRouter = require('./router/userinfo.js')
 app.use('/user', userRouter)
 
+// setting请求
+const settingRouter = require('./router/setting.js')
+app.use('/setting', settingRouter)
+
 // 对不符合joi规则的情况进行报错
 app.use((err, req, res, next) => {
 	if (err instanceof Joi.ValidationError) {
