@@ -15,11 +15,20 @@ router.post("/uploadSwiper", settingHandler.uploadSwiper);
 // 获取所有轮播图
 router.post("/getAllSwiper", settingHandler.getAllSwiper);
 
-// 获取公司相关信息
+// 获取公司全部相关信息
 router.post("/getAllCompanyIntroduce", settingHandler.getAllCompanyIntroduce);
+
+// 获取公司相关信息
+router.post("/getCompanyIntroduce", settingHandler.getCompanyIntroduce);
 
 // 修改公司相关信息
 router.post("/uploadCompanyIntroduce", settingHandler.uploadCompanyIntroduce);
+
+// 获取公司名称
+router.post("/getCompanyName", settingHandler.getCompanyName);
+
+// 更新公司名称
+router.post("/updateCompanyName", settingHandler.updateCompanyName);
 
 // 暴露路由
 module.exports = router;
