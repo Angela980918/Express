@@ -88,7 +88,7 @@ exports.getAllSwiper = (req, res) => {
   });
 };
 
-// 获取公司相关信息
+// 获取公司全部相关信息
 exports.getAllCompanyIntroduce = (req, res) => {
   const sql = "select * from setting where set_name like '%公司%'";
   db.query(sql, (err, result) => {
@@ -128,6 +128,76 @@ exports.uploadCompanyIntroduce = (req, res) => {
           msg: `'${set_name}'的相关信息修改成功`,
         });
       }
+    });
+  });
+};
+
+// 获取公司相关信息 set_name
+exports.getCompanyIntroduce = (req, res) => {
+  const { set_name } = req.body;
+  const missingParamError = checkBodyParams(req.body, ["set_name"]);
+  // 校验参数是否有缺失
+  if (missingParamError) {
+    return res.cc(missingParamError);
+  }
+
+  // 1.判断是否有相关信息
+  const sqls =
+    "select * from setting where set_name = ? and set_name like '%公司%'";
+  db.query(sqls, set_name, (err, result) => {
+    if (err) return res.cc(err);
+    if (result.length !== 1) return res.cc(`'${set_name}'的相关信息不存在`);
+
+    res.send({
+      status: 0,
+      msg: `'${set_name}'获取成功`,
+      result,
+    });
+  });
+};
+
+// 获取公司名称
+exports.getCompanyName = (req, res) => {
+  // 1.判断是否有相关信息
+  const sqls = "select * from setting where set_name = '公司名称'";
+  db.query(sqls, (err, result) => {
+    if (err) return res.cc(err);
+    if (result.length !== 1) return res.cc(`'公司名称'的相关信息不存在`);
+
+    res.send({
+      status: 0,
+      msg: `'公司名称'获取成功`,
+      result,
+    });
+  });
+};
+
+// 更新公司名称 set_name set_value
+exports.updateCompanyName = (req, res) => {
+  const { set_value } = req.body;
+  const missingParamError = checkBodyParams(req.body, ["set_value"]);
+  // 校验参数是否有缺失
+  if (missingParamError) {
+    return res.cc(missingParamError);
+  }
+
+  // 1.判断是否有相关信息
+  const sqls = "select * from setting where set_name = '公司名称'";
+  db.query(sqls, (err, result) => {
+    if (err) return res.cc(err);
+    if (result.length !== 1) return res.cc(`'公司名称'的相关信息不存在`);
+    if (result[0].set_value === set_value)
+      return res.cc(`'公司名称'的相关信息无异动`);
+
+    // 2.更新相关信息
+    const sqlu = "update setting set set_value = ? where set_name = '公司名称'";
+    db.query(sqlu, set_value, (err, result) => {
+      if (err) return res.cc(err);
+      if (result.affectedRows !== 1) return res.cc(`'公司名称'的信息更新失败`);
+      res.send({
+        status: 0,
+        msg: `'公司名称'的信息更新成功`,
+      });
     });
   });
 };
