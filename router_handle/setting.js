@@ -90,7 +90,7 @@ exports.getAllSwiper = (req, res) => {
 
 // 获取公司全部相关信息
 exports.getAllCompanyIntroduce = (req, res) => {
-  const sql = "select * from setting where set_name like '%公司%'";
+  const sql = "select * from setting where set_name like '%公司%' and set_name not like '%名称%'";
   db.query(sql, (err, result) => {
     if (err) return res.cc(err);
     res.send({
