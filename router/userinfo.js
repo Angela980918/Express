@@ -54,5 +54,26 @@ router.post('/createID', userInfoHandler.createID)
 // 修改密码 (验证用户邮箱email,用户账号account)
 router.post('/verifyAccountAndEmail', userInfoHandler.verifyAccountAndEmail)
 
+// 添加管理人员
+router.post('/createAdmin', userInfoHandler.createAdmin)
+
+// 获取管理人员列表
+router.post('/getAdminList', userInfoHandler.getAdminList)
+
+// 编辑管理人员信息
+router.post('/editAdmin', userInfoHandler.editAdmin)
+
+// 管理员进行降权
+router.post('/changeAdminToUser', userInfoHandler.changeAdminToUser)
+
+// 普通用户进行赋权
+router.post('/changeUserToAdmin', userInfoHandler.changeUserToAdmin)
+
+// 冻结账号
+router.post('/freezeUser', userInfoHandler.freezeUser)
+
+// 解冻账号
+router.post('/unFreezeUser', userInfoHandler.unFreezeUser)
+
 // 向外暴露路由
 module.exports = router
