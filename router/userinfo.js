@@ -75,5 +75,11 @@ router.post('/freezeUser', userInfoHandler.freezeUser)
 // 解冻账号
 router.post('/unFreezeUser', userInfoHandler.unFreezeUser)
 
+// 获取冻结用户列表
+router.post('/getFreezeUserList', userInfoHandler.getFreezeUserList)
+
+// 删除用户相关信息
+router.post('/deleteUser', userInfoHandler.deleteUser)
+
 // 向外暴露路由
 module.exports = router
