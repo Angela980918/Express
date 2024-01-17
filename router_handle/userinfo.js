@@ -9,13 +9,14 @@ const fs = require("fs");
 // 日期
 const moment = require("moment");
 
-// 上传头像
+/**
+ * 上传头像
+ */
 exports.uploadAvatar = (req, res) => {
 	const {
 		id,
 		account
 	} = req.body;
-	console.log(req.body);
 
 	// 1.判断用户是否有上传过头像
 	const sqld = "select * from users where id = ? and account = ?";
@@ -55,55 +56,85 @@ exports.uploadAvatar = (req, res) => {
 			newName = `${AvatarID}.${extension}`;
 			fs.renameSync("./public/upload/" + oldName, "./public/upload/" + newName);
 
-			// 插入新头像 URL 到数据库
-			const sqlInsertImage = "INSERT INTO image SET ?";
-			db.query(
-				sqlInsertImage, {
-					image_url: `http://127.0.0.1:3007/upload/${newName}`,
-					onlyid: AvatarID,
-				},
-				(err, result) => {
-					if (err) return res.cc(err);
+			// 插入新头像 URL 到数据库 --> 更新在用户最新一条数据
+			// 1.1 查询用户最新的信息
+			const sqlImageS = 'select * from image where account =? order by id desc limit 1'
+			db.query(sqlImageS, account, (err, result) => {
+				if (err) return res.cc(err);
+				if (result.length > 0) {
+					let accountID = result[0].id
+					let imgUrl = `http://127.0.0.1:3007/upload/${newName}`
+					// 1.2 新头像更新该数据中
+					const sqlImageU = "update image SET image_url = ?, onlyid = ? where id = ?";
+					db.query(
+						sqlImageU, [imgUrl, AvatarID, accountID],
+						(err, result) => {
+							if (err) return res.cc(err);
+							console.log(sqlImageU, result);
+						}
+					)
+				} else {
+					// 1.3 新头像数据插入到数据库中
+					const sqlInsertImage = "INSERT INTO image SET ?";
+					db.query(
+						sqlInsertImage, {
+							image_url: `http://127.0.0.1:3007/upload/${newName}`,
+							onlyid: AvatarID,
+							account
+						},
+						(err, result) => {
+							if (err) return res.cc(err);
+							console.log(sqlInsertImage, result);
+						}
+					);
 				}
-			);
-
-			res.send({
-				AvatarID,
-				status: 0,
-				url: "http://127.0.0.1:3007/upload/" + newName,
-				dmsg: dmsg || "",
-				msg: "头像更新成功",
-			});
+				res.send({
+					AvatarID,
+					status: 0,
+					url: "http://127.0.0.1:3007/upload/" + newName,
+					dmsg: dmsg || "",
+					msg: "头像更新成功",
+				});
+			})
 		} catch (error) {
 			res.cc(error);
 		}
 	});
 };
 
-// 绑定账号 onlyid account url 关联 users,image表
+/**
+ * 绑定账号 
+ * onlyid account url 关联 users,image表
+ */
 exports.bindAccount = (req, res) => {
 	const {
 		account,
 		onlyId,
 		url
 	} = req.body;
-	const sql = "update image set account = ? where onlyId = ?";
-	db.query(sql, [account, onlyId], (err, result) => {
+	// 查询
+	const sqls = 'select * from image where account = ? order by id desc limit 1'
+	db.query(sqls, account, (err, result) => {
 		if (err) return res.cc(err);
-		if (result.affectedRows == 1) {
+		if (result.length == 1) {
+			// 图片地址保存至user表中
 			const sql2 = "update users set image_url = ? where account = ?";
 			db.query(sql2, [url, account], (err, result) => {
 				if (err) return res.cc(err);
+				console.log(result);
 				res.send({
 					status: 0,
 					msg: "修改成功",
 				});
 			});
 		}
-	});
+	})
 };
 
-// 获取用户信息 id
+/**
+ * 获取用户信息 
+ * id
+ */
 exports.getUserInfo = (req, res) => {
 	const sql = "select * from users where id = ?";
 	db.query(sql, req.body.id, (err, result) => {
@@ -115,7 +146,11 @@ exports.getUserInfo = (req, res) => {
 	});
 };
 
-// 修改姓名 id name
+/**
+ * 修改姓名 
+ * id 
+ * name
+ */
 exports.changeName = (req, res) => {
 	const {
 		id,
@@ -142,7 +177,11 @@ exports.changeName = (req, res) => {
 	});
 };
 
-// 修改性别 id sex
+/**
+ * 修改性别 
+ * id 
+ * sex
+ */
 exports.changeSex = (req, res) => {
 	const {
 		id,
@@ -250,7 +289,11 @@ exports.updateUserInfo = (req, res) => {
 	});
 };
 
-// 修改邮箱 id email
+/**
+ * 修改邮箱 
+ * id 
+ * email
+ */
 exports.changeEmail = (req, res) => {
 	const {
 		id,
@@ -277,7 +320,11 @@ exports.changeEmail = (req, res) => {
 	});
 };
 
-// 登陆页修改密码 newPassword id
+/**
+ * 登陆页修改密码 
+ * id 
+ * newPassword
+ */
 exports.changePasswordInLogin = (req, res) => {
 	const user = req.body;
 	user.newPassword = bcrypt.hashSync(user.newPassword, 10);
@@ -676,6 +723,97 @@ exports.unFreezeUser = (req, res) => {
 				status: 0,
 				msg: '账号解冻成功'
 			})
+		})
+	})
+}
+
+/**
+ * 获取冻结状态的用户列表
+ */
+exports.getFreezeUserList = (req, res) => {
+	// 冻结状态
+	const status = 1
+
+	// 查询冻结用户列表
+	const sqls = 'select * from users where status = ?'
+	db.query(sqls, status, (err, result) => {
+		if (err) return res.cc(err)
+		if (result.length == 0)
+			return res.send({
+				status: 1,
+				msg: '暂无冻结用户'
+			})
+		res.send({
+			status: 0,
+			msg: '获取冻结用户列表成功',
+			result
+		})
+	})
+}
+
+/**
+ * 删除用户
+ * id
+ * account
+ */
+exports.deleteUser = (req, res) => {
+	const {
+		id,
+		account
+	} = req.body
+
+	// 查询用户信息
+	const sqls = 'select * from users where id = ? and account = ?'
+	db.query(sqls, [id, account], (err, result) => {
+		if (err) return res.cc(err)
+		if (result.length == 0)
+			return res.send({
+				status: 1,
+				msg: '暂无此用户'
+			})
+		// 1.删除user表中用户信息
+		const sqld = 'delete from users where id = ?'
+		db.query(sqld, id, (err, result) => {
+			if (err) return res.cc(err)
+
+			// 2.查询image表中用户头像地址
+			// 2.1删除用户头像,避免造成系统冗余
+			const sqls2 = 'select * from image where account = ? order by id desc limit 1'
+			db.query(sqls2, account, async (err, result) => {
+				if (err) return res.cc(err)
+				if (result.length == 1)
+					try {
+						// 2.删除旧头像文件（如果存在）
+						let dmsg = "";
+						if (result[0].image_url) {
+							let url = result[0].image_url;
+							let startIndex = url.lastIndexOf("upload/");
+							let oldFile = "./public/" + url.slice(startIndex);
+
+							await new Promise((resolve, reject) => {
+								fs.unlink(oldFile, (err) => {
+									if (err) return reject(err);
+									resolve(true);
+								});
+							});
+							dmsg = "旧头像删除成功";
+						}
+
+						// 3.删除image表中的用户相关信息
+						const sqld = 'delete from image where account = ?'
+						db.query(sqld, account, (err, result) => {
+							if (err) return res.cc(err)
+							res.send({
+								status: 0,
+								dmsg: dmsg || "",
+								msg: '删除用户成功'
+							})
+						})
+					} catch (err) {
+						res.cc(err)
+					}
+			})
+
 		})
 	})
 }
