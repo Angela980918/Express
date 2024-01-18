@@ -81,5 +81,9 @@ router.post('/getFreezeUserList', userInfoHandler.getFreezeUserList)
 // 删除用户相关信息
 router.post('/deleteUser', userInfoHandler.deleteUser)
 
+// 获取对应身份的一个总人数
+router.post('/getPeopleListLength', userInfoHandler.getPeopleListLength)
+
+
 // 向外暴露路由
 module.exports = router
