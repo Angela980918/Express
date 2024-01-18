@@ -817,3 +817,23 @@ exports.deleteUser = (req, res) => {
 		})
 	})
 }
+
+/**
+ * 获取对应身份的一个总人数
+ * identity
+ */
+exports.getPeopleListLength = (req, res) => {
+	const {
+		identity
+	} = req.body
+
+	const sqls = 'select * from users where identity = ?'
+	db.query(sqls, identity, (err, result) => {
+		if (err) return res.cc(err)
+		res.send({
+			status: 0,
+			msg: `${identity}总人数为：${result.length}`,
+			length: result.length
+		})
+	})
+}
