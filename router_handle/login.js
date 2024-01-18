@@ -53,7 +53,7 @@ exports.register = (req, res) => {
 				})
 			}
 			res.send({
-				statusL: 1,
+				status: 0,
 				msg: '注册成功',
 			})
 		})
