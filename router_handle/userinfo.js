@@ -195,6 +195,7 @@ exports.changeSex = (req, res) => {
       });
     });
   });
+  console.log("111");
 };
 
 /**
