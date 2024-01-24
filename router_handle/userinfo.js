@@ -55,30 +55,30 @@ exports.uploadAvatar = (req, res) => {
 
       // 插入新头像 URL 到数据库 --> 更新在用户最新一条数据
       // 1.1 查询用户最新的信息
-      const sqlImageS = 'select * from image where account =? order by id desc limit 1'
+      const sqlImageS =
+        "select * from image where account =? order by id desc limit 1";
       db.query(sqlImageS, account, (err, result) => {
         if (err) return res.cc(err);
         if (result.length > 0) {
-          let accountID = result[0].id
-          let imgUrl = `http://127.0.0.1:3007/upload/${newName}`
+          let accountID = result[0].id;
+          let imgUrl = `http://127.0.0.1:3007/upload/${newName}`;
           // 1.2 新头像更新该数据中
-          const sqlImageU = "update image SET image_url = ?, onlyid = ? where id = ?";
-          db.query(
-            sqlImageU, [imgUrl, AvatarID, accountID],
-            (err, result) => {
-              if (err) return res.cc(err);
-              console.log(sqlImageU, result);
-            }
-          )
+          const sqlImageU =
+            "update image SET image_url = ?, onlyid = ? where id = ?";
+          db.query(sqlImageU, [imgUrl, AvatarID, accountID], (err, result) => {
+            if (err) return res.cc(err);
+            console.log(sqlImageU, result);
+          });
         } else {
           // 1.3 新头像数据插入到数据库中
           const sqlInsertImage = "INSERT INTO image SET ?";
           db.query(
-            sqlInsertImage, {
-            image_url: `http://127.0.0.1:3007/upload/${newName}`,
-            onlyid: AvatarID,
-            account
-          },
+            sqlInsertImage,
+            {
+              image_url: `http://127.0.0.1:3007/upload/${newName}`,
+              onlyid: AvatarID,
+              account,
+            },
             (err, result) => {
               if (err) return res.cc(err);
               console.log(sqlInsertImage, result);
@@ -92,7 +92,7 @@ exports.uploadAvatar = (req, res) => {
           dmsg: dmsg || "",
           msg: "头像更新成功",
         });
-      })
+      });
     } catch (error) {
       res.cc(error);
     }
@@ -195,7 +195,6 @@ exports.changeSex = (req, res) => {
       });
     });
   });
-  console.log("111");
 };
 
 /**
