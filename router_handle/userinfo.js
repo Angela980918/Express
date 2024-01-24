@@ -78,10 +78,10 @@ exports.uploadAvatar = (req, res) => {
 					const sqlInsertImage = "INSERT INTO image SET ?";
 					db.query(
 						sqlInsertImage, {
-							image_url: `http://127.0.0.1:3007/upload/${newName}`,
-							onlyid: AvatarID,
-							account
-						},
+						image_url: `http://127.0.0.1:3007/upload/${newName}`,
+						onlyid: AvatarID,
+						account
+					},
 						(err, result) => {
 							if (err) return res.cc(err);
 							console.log(sqlInsertImage, result);
@@ -136,8 +136,11 @@ exports.bindAccount = (req, res) => {
  * id
  */
 exports.getUserInfo = (req, res) => {
-	const sql = "select * from users where id = ?";
-	db.query(sql, req.body.id, (err, result) => {
+	const {
+		id
+	} = req.body
+	const sql = "select * from users where id = ? or user_id = ? or account = ?";
+	db.query(sql, [id,id,id], (err, result) => {
 		if (err) return res.cc(err);
 		res.send({
 			status: 0,
