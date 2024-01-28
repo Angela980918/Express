@@ -454,6 +454,7 @@ exports.createAdmin = (req, res) => {
     const sqli = "insert into users set ?";
     // 创建时间
     const create_time = new Date();
+    console.log(create_time);
     db.query(
       sqli,
       {
@@ -469,6 +470,7 @@ exports.createAdmin = (req, res) => {
         status: 0,
       },
       (err, result) => {
+        console.log(result);
         if (err) return res.cc(err);
         if (result.affectedRows !== 1) {
           return res.send({
@@ -495,7 +497,9 @@ exports.getAdminList = (req, res) => {
     if (err) return res.cc(err);
     result.forEach((item) => {
       item.password = "";
-      item.create_time = "";
+      if(!item.update_time){
+        item.update_time = item.create_time;
+      }
       item.image_url = "";
       item.status = "";
     });
